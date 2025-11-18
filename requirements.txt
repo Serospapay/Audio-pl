@@ -1,0 +1,8 @@
+PyQt6==6.6.1
+PyQt6-Qt6==6.6.1
+mutagen==1.47.0
+pytest==7.4.3
+pytest-qt==4.2.0
+qdarkstyle>=3.2.0
+qtawesome>=1.2.0
+
