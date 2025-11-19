@@ -307,6 +307,10 @@ class MainWindow(QMainWindow):
         dialog.setMinimumSize(450, 400)
         dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
         
+        # Escape закриває діалог
+        escape_shortcut = QShortcut(QKeySequence("Esc"), dialog)
+        escape_shortcut.activated.connect(dialog.accept)
+        
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(12)
@@ -445,6 +449,10 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle("Статистика")
         dialog.setMinimumSize(650, 550)
         dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
+        
+        # Escape закриває діалог
+        escape_shortcut = QShortcut(QKeySequence("Esc"), dialog)
+        escape_shortcut.activated.connect(dialog.accept)
         
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(20, 20, 20, 20)
@@ -1065,7 +1073,7 @@ class MainWindow(QMainWindow):
         font.setBold(True)
         font.setWeight(QFont.Weight.Bold)
         self._track_title_label.setFont(font)
-        self._track_title_label.setStyleSheet("color: #ffffff; background: transparent;")
+        self._track_title_label.setStyleSheet("color: #ffffff; background: transparent; border: none;")
         self._track_title_label.setWordWrap(True)
         self._track_title_label.mousePressEvent = lambda e: self._add_files()
         self._track_title_label.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -1084,7 +1092,7 @@ class MainWindow(QMainWindow):
         font2.setPointSize(13)
         font2.setWeight(QFont.Weight.Medium)
         self._track_artist_label.setFont(font2)
-        self._track_artist_label.setStyleSheet("color: #a0a0a0; background: transparent;")
+        self._track_artist_label.setStyleSheet("color: #a0a0a0; background: transparent; border: none;")
         artist_album_layout.addWidget(self._track_artist_label, 0)
         
         # Роздільник
@@ -1098,7 +1106,7 @@ class MainWindow(QMainWindow):
         font3 = QFont()
         font3.setPointSize(13)
         self._album_label.setFont(font3)
-        self._album_label.setStyleSheet("color: #808080; background: transparent;")
+        self._album_label.setStyleSheet("color: #808080; background: transparent; border: none;")
         artist_album_layout.addWidget(self._album_label, 0)
         
         artist_album_layout.addStretch()
@@ -1154,7 +1162,7 @@ class MainWindow(QMainWindow):
         font.setBold(True)
         font.setWeight(QFont.Weight.Bold)
         self._track_title_label.setFont(font)
-        self._track_title_label.setStyleSheet("color: #ffffff; background: transparent;")
+        self._track_title_label.setStyleSheet("color: #ffffff; background: transparent; border: none;")
         self._track_title_label.setWordWrap(True)
         self._track_title_label.setMinimumHeight(28)
         self._track_title_label.setMaximumHeight(60)
@@ -1173,7 +1181,7 @@ class MainWindow(QMainWindow):
         font2.setPointSize(11)
         font2.setWeight(QFont.Weight.Medium)
         self._track_artist_label.setFont(font2)
-        self._track_artist_label.setStyleSheet("color: #a0a0a0; background: transparent;")
+        self._track_artist_label.setStyleSheet("color: #a0a0a0; background: transparent; border: none;")
         self._track_artist_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         artist_album_layout.addWidget(self._track_artist_label, 0)
         
@@ -1189,7 +1197,7 @@ class MainWindow(QMainWindow):
         font3 = QFont()
         font3.setPointSize(11)
         self._album_label.setFont(font3)
-        self._album_label.setStyleSheet("color: #808080; background: transparent;")
+        self._album_label.setStyleSheet("color: #808080; background: transparent; border: none;")
         self._album_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         artist_album_layout.addWidget(self._album_label, 0)
         
@@ -1923,6 +1931,15 @@ class MainWindow(QMainWindow):
         
         state = load_state()
         if state:
+            # Відновлюємо геометрію вікна
+            geometry = state.get('window_geometry')
+            if geometry:
+                self.setGeometry(
+                    geometry.get('x', 100),
+                    geometry.get('y', 100),
+                    geometry.get('width', 900),
+                    geometry.get('height', 600)
+                )
             # Відновлюємо плейлист
             if state.get('playlist'):
                 self._player.get_playlist().add_tracks(state['playlist'])
@@ -2027,13 +2044,22 @@ class MainWindow(QMainWindow):
         if current_track and self._player.get_state() == QMediaPlayer.PlaybackState.PlayingState:
             position = self._player.get_position()
         
+        # Зберігаємо геометрію вікна
+        geometry = {
+            'x': self.x(),
+            'y': self.y(),
+            'width': self.width(),
+            'height': self.height()
+        }
+        
         save_state(
             playlist=playlist.get_tracks(),
             current_index=current_index,
             volume=self._player.get_volume(),
             position=position,
             repeat=self._player.get_repeat(),
-            shuffle=self._player.get_shuffle()
+            shuffle=self._player.get_shuffle(),
+            window_geometry=geometry
         )
         
         event.accept()
@@ -2779,6 +2805,10 @@ class MainWindow(QMainWindow):
         search_input.textChanged.connect(self._filter_playlist)
         layout.addWidget(search_input, 0)
         
+        # Ctrl+F фокусує пошук
+        search_shortcut = QShortcut(QKeySequence("Ctrl+F"), dialog)
+        search_shortcut.activated.connect(search_input.setFocus)
+        
         # Список плейлисту
         playlist_list = QListWidget()
         playlist_list.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -2786,12 +2816,48 @@ class MainWindow(QMainWindow):
         playlist_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         playlist_list.customContextMenuRequested.connect(self._show_playlist_context_menu)
         
+        # Обробка клавіш для плейлисту
+        def handle_playlist_keys(event):
+            from PyQt6.QtCore import Qt
+            if event.key() == Qt.Key.Key_Delete:
+                # Delete - видалити трек
+                current = playlist_list.currentItem()
+                if current:
+                    self._remove_track_from_list(playlist_list)
+            elif event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
+                # Enter - відтворити трек
+                current = playlist_list.currentItem()
+                if current:
+                    self._on_playlist_item_double_clicked(current)
+            elif event.key() == Qt.Key.Key_Escape:
+                # Escape - закрити діалог
+                dialog.accept()
+            else:
+                QListWidget.keyPressEvent(playlist_list, event)
+        
+        playlist_list.keyPressEvent = handle_playlist_keys
+        
         # Заповнюємо список
         playlist = self._player.get_playlist()
         for i, track_path in enumerate(playlist.get_tracks()):
-            track_name = Path(track_path).name
+            # Отримуємо інфо про трек
+            info = self._player.get_track_info(track_path)
+            duration_str = self._format_time(info.get('duration', 0))
+            
+            # Назва з тривалістю
+            track_name = f"{Path(track_path).stem} ({duration_str})"
             item = QListWidgetItem(track_name)
             item.setData(Qt.ItemDataRole.UserRole, track_path)
+            
+            # Tooltip з повною інформацією
+            bitrate = info.get('bitrate', 'Unknown')
+            file_format = Path(track_path).suffix[1:].upper()
+            tooltip = f"{Path(track_path).name}\n"
+            tooltip += f"Виконавець: {info.get('artist', 'Невідомо')}\n"
+            tooltip += f"Альбом: {info.get('album', 'Невідомо')}\n"
+            tooltip += f"Формат: {file_format} • {bitrate}"
+            item.setToolTip(tooltip)
+            
             playlist_list.addItem(item)
         
         # Виділяємо поточний трек
@@ -2939,10 +3005,10 @@ class MainWindow(QMainWindow):
                 self._update_playlist_display()
     
     def _on_playlist_item_double_clicked(self, item: QListWidgetItem):
-        """Обробник подвійного кліку на елемент плейлисту"""
+        """Обробник подвійного кліку на елемент плейлисту - відтворює трек"""
         file_path = item.data(Qt.ItemDataRole.UserRole)
         if file_path:
-            index = self._playlist_widget.row(item)
+            index = self._playlist_widget.row(item) if hasattr(self, '_playlist_widget') and self._playlist_widget else item.listWidget().row(item)
             self._player.get_playlist().set_current_index(index)
             self._player.load_file(file_path)
             self._player.play()
