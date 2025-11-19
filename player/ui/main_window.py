@@ -372,11 +372,91 @@ class MainWindow(QMainWindow):
     
     def _show_about(self):
         """Показує діалог Про програму"""
-        QMessageBox.about(self, "Про програму", 
-            "Audio Player v1.0\n\n"
-            "Мінімалістичний аудіоплеєр\n"
-            "з сучасним інтерфейсом.\n\n"
-            "© 2024")
+        from PyQt6.QtWidgets import QShortcut
+        from PyQt6.QtGui import QKeySequence
+        
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Про програму")
+        dialog.setMinimumSize(450, 320)
+        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
+        
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+        
+        # Назва програми
+        title = QLabel("Audio Player")
+        title.setStyleSheet("color: #6366f1; font-size: 24px; font-weight: bold;")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title)
+        
+        # Версія
+        version = QLabel("Версія 1.0")
+        version.setStyleSheet("color: #888; font-size: 14px;")
+        version.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(version)
+        
+        layout.addSpacing(10)
+        
+        # Опис
+        description = QLabel("Мінімалістичний аудіоплеєр з сучасним інтерфейсом")
+        description.setStyleSheet("color: #ffffff; font-size: 13px;")
+        description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        description.setWordWrap(True)
+        layout.addWidget(description)
+        
+        layout.addSpacing(20)
+        
+        # Особливості
+        features = QLabel(
+            "• Підтримка популярних аудіоформатів\n"
+            "• Плейлисти та історія відтворення\n"
+            "• Статистика прослуховувань\n"
+            "• Настроюваний колір акценту\n"
+            "• Гарячі клавіші та медіа-клавіші"
+        )
+        features.setStyleSheet("color: #cccccc; font-size: 12px;")
+        layout.addWidget(features)
+        
+        layout.addStretch()
+        
+        # Копірайт
+        copyright_label = QLabel("© 2024")
+        copyright_label.setStyleSheet("color: #666; font-size: 11px;")
+        copyright_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(copyright_label)
+        
+        # Кнопка закриття
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addStretch()
+        
+        close_btn = QPushButton("Закрити")
+        close_btn.setFixedHeight(32)
+        close_btn.setStyleSheet("""
+            QPushButton {
+                background: #6366f1;
+                border: none;
+                border-radius: 4px;
+                color: #ffffff;
+                font-size: 13px;
+                padding: 0 20px;
+            }
+            QPushButton:hover {
+                background: #4f46e5;
+            }
+            QPushButton:pressed {
+                background: #3730a3;
+            }
+        """)
+        close_btn.clicked.connect(dialog.accept)
+        buttons_layout.addWidget(close_btn)
+        
+        layout.addLayout(buttons_layout)
+        
+        # Escape для закриття
+        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
+        
+        dialog.exec()
     
     def _update_recent_playlists_menu(self, menu):
         """Оновлює меню останніх плейлистів"""
@@ -665,8 +745,8 @@ class MainWindow(QMainWindow):
     
     def _choose_accent_color(self):
         """Діалог вибору кольору акценту"""
-        from PyQt6.QtWidgets import QColorDialog
-        from PyQt6.QtGui import QColor
+        from PyQt6.QtWidgets import QColorDialog, QShortcut
+        from PyQt6.QtGui import QColor, QKeySequence
         
         # Попередньо встановлені кольори
         presets = [
@@ -682,7 +762,7 @@ class MainWindow(QMainWindow):
         
         dialog = QDialog(self)
         dialog.setWindowTitle("Виберіть колір акценту")
-        dialog.setMinimumSize(400, 300)
+        dialog.setMinimumSize(450, 320)
         dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
         
         layout = QVBoxLayout(dialog)
@@ -743,6 +823,9 @@ class MainWindow(QMainWindow):
         current_label = QLabel(f"Поточний колір: {self._accent_color}")
         current_label.setStyleSheet("color: #888; font-size: 12px;")
         layout.addWidget(current_label)
+        
+        # Escape для закриття
+        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
         
         dialog.exec()
     
@@ -898,9 +981,12 @@ class MainWindow(QMainWindow):
     
     def _show_playback_speed(self):
         """Показує діалог налаштування швидкості відтворення"""
+        from PyQt6.QtWidgets import QShortcut
+        from PyQt6.QtGui import QKeySequence
+        
         dialog = QDialog(self)
         dialog.setWindowTitle("Швидкість відтворення")
-        dialog.setMinimumSize(400, 250)
+        dialog.setMinimumSize(480, 280)
         dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
         
         layout = QVBoxLayout(dialog)
@@ -1001,7 +1087,7 @@ class MainWindow(QMainWindow):
         buttons_layout.addStretch()
         
         close_btn = QPushButton("Закрити")
-        close_btn.setFixedSize(80, 32)
+        close_btn.setFixedHeight(32)
         close_btn.setStyleSheet("""
             QPushButton {
                 background: #6366f1;
@@ -1009,14 +1095,22 @@ class MainWindow(QMainWindow):
                 border-radius: 4px;
                 color: #ffffff;
                 font-size: 13px;
-                font-weight: 500;
+                padding: 0 20px;
             }
-            QPushButton:hover { background: #7c3aed; }
+            QPushButton:hover {
+                background: #4f46e5;
+            }
+            QPushButton:pressed {
+                background: #3730a3;
+            }
         """)
         close_btn.clicked.connect(dialog.accept)
         buttons_layout.addWidget(close_btn)
         
         layout.addLayout(buttons_layout)
+        
+        # Escape для закриття
+        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
         
         dialog.exec()
     
@@ -2670,7 +2764,8 @@ class MainWindow(QMainWindow):
     
     def _show_history(self):
         """Показує вікно з історією відтворення"""
-        from PyQt6.QtWidgets import QDialog, QVBoxLayout, QListWidget, QListWidgetItem, QPushButton, QLabel
+        from PyQt6.QtWidgets import QDialog, QVBoxLayout, QListWidget, QListWidgetItem, QPushButton, QLabel, QShortcut
+        from PyQt6.QtGui import QKeySequence
         from pathlib import Path
         
         history = self._player.get_history().get_recent(50)
@@ -2681,22 +2776,44 @@ class MainWindow(QMainWindow):
         
         dialog = QDialog(self)
         dialog.setWindowTitle("Історія відтворення")
-        dialog.setMinimumWidth(600)
-        dialog.setMinimumHeight(400)
+        dialog.setMinimumSize(650, 500)
+        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
         
         layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(12)
         
         # Заголовок
         title = QLabel(f"Нещодавно відтворені ({len(history)} треків)")
+        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        font = QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        title.setFont(font)
         layout.addWidget(title)
         
         # Список історії
         history_list = QListWidget()
+        history_list.setStyleSheet("""
+            QListWidget {
+                background: #1a1a1a;
+                border: 1px solid #2a2a2a;
+                border-radius: 6px;
+                color: #ffffff;
+                padding: 8px;
+                font-size: 13px;
+            }
+            QListWidget::item {
+                padding: 8px;
+                border-radius: 4px;
+                margin: 2px 0;
+            }
+            QListWidget::item:hover {
+                background: #2a2a2a;
+            }
+            QListWidget::item:selected {
+                background: #6366f1;
+                color: #ffffff;
+            }
+        """)
+        
         for entry in history:
             title_text = entry.get('title', Path(entry.get('file_path', '')).stem)
             artist_text = entry.get('artist', 'Невідомий виконавець')
@@ -2710,18 +2827,57 @@ class MainWindow(QMainWindow):
         
         # Кнопки
         buttons_layout = QHBoxLayout()
+        buttons_layout.setSpacing(8)
         
         clear_btn = QPushButton("Очистити історію")
+        clear_btn.setFixedHeight(32)
+        clear_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+                border: 1px solid #444;
+                border-radius: 4px;
+                color: #ffffff;
+                font-size: 13px;
+                padding: 0 16px;
+            }
+            QPushButton:hover {
+                background: #2a2a2a;
+                border: 1px solid #6366f1;
+            }
+            QPushButton:pressed {
+                background: #1a1a1a;
+            }
+        """)
         clear_btn.clicked.connect(lambda: self._clear_history(dialog))
         buttons_layout.addWidget(clear_btn)
         
         buttons_layout.addStretch()
         
         close_btn = QPushButton("Закрити")
+        close_btn.setFixedHeight(32)
+        close_btn.setStyleSheet("""
+            QPushButton {
+                background: #6366f1;
+                border: none;
+                border-radius: 4px;
+                color: #ffffff;
+                font-size: 13px;
+                padding: 0 20px;
+            }
+            QPushButton:hover {
+                background: #4f46e5;
+            }
+            QPushButton:pressed {
+                background: #3730a3;
+            }
+        """)
         close_btn.clicked.connect(dialog.accept)
         buttons_layout.addWidget(close_btn)
         
         layout.addLayout(buttons_layout)
+        
+        # Escape для закриття
+        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
         
         dialog.exec()
     
