@@ -511,22 +511,10 @@ class MainWindow(QMainWindow):
     
     def _show_statistics(self):
         """Показує розширену статистику з топ-10 та загальним часом"""
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Статистика")
-        dialog.setMinimumSize(650, 550)
-        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
+        dialog, layout = self._create_dialog("Статистика", 650, 550)
         
-        # Escape закриває діалог
-        escape_shortcut = QShortcut(QKeySequence("Esc"), dialog)
-        escape_shortcut.activated.connect(dialog.accept)
-        
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
-        
-        title = QLabel("Статистика відтворення")
-        title.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; border: none;")
-        layout.addWidget(title)
+        # Заголовок
+        self._add_dialog_title(layout, "Статистика відтворення")
         
         # Отримуємо дані
         playlist = self._player.get_playlist()
@@ -614,7 +602,7 @@ class MainWindow(QMainWindow):
         buttons_layout = QHBoxLayout()
         
         export_btn = QPushButton("Експорт")
-        export_btn.setFixedSize(80, 32)
+        export_btn.setFixedHeight(32)
         export_btn.setStyleSheet("""
             QPushButton {
                 background: transparent;
@@ -622,12 +610,14 @@ class MainWindow(QMainWindow):
                 border-radius: 4px;
                 color: #6366f1;
                 font-size: 13px;
-                font-weight: 500;
-                transition: all 0.2s ease;
+                padding: 0 16px;
             }
             QPushButton:hover {
                 background: #6366f1;
                 color: #ffffff;
+            }
+            QPushButton:pressed {
+                background: #4f46e5;
             }
         """)
         export_btn.clicked.connect(lambda: self._export_statistics(total_hours, total_minutes, len(history_data), top_tracks))
@@ -636,7 +626,7 @@ class MainWindow(QMainWindow):
         buttons_layout.addStretch()
         
         close_btn = QPushButton("Закрити")
-        close_btn.setFixedSize(80, 32)
+        close_btn.setFixedHeight(32)
         close_btn.setStyleSheet("""
             QPushButton {
                 background: #6366f1;
@@ -644,11 +634,14 @@ class MainWindow(QMainWindow):
                 border-radius: 4px;
                 color: #ffffff;
                 font-size: 13px;
-                font-weight: 500;
-                transition: all 0.2s ease;
+                padding: 0 20px;
             }
-            QPushButton:hover { background: #7c3aed; }
-            QPushButton:pressed { background: #5b21b6; }
+            QPushButton:hover {
+                background: #4f46e5;
+            }
+            QPushButton:pressed {
+                background: #3730a3;
+            }
         """)
         close_btn.clicked.connect(dialog.accept)
         buttons_layout.addWidget(close_btn)
@@ -745,18 +738,10 @@ class MainWindow(QMainWindow):
             ("#06b6d4", "Бірюзовий"),
         ]
         
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Виберіть колір акценту")
-        dialog.setMinimumSize(450, 320)
-        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
+        dialog, layout = self._create_dialog("Виберіть колір акценту", 480, 340)
         
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
-        
-        title = QLabel("Виберіть колір акценту")
-        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold; border: none;")
-        layout.addWidget(title)
+        # Заголовок
+        self._add_dialog_title(layout, "Виберіть колір акценту", 16)
         
         # Попередньо встановлені кольори
         presets_layout = QHBoxLayout()
@@ -808,9 +793,6 @@ class MainWindow(QMainWindow):
         current_label = QLabel(f"Поточний колір: {self._accent_color}")
         current_label.setStyleSheet("color: #888; font-size: 12px; border: none;")
         layout.addWidget(current_label)
-        
-        # Escape для закриття
-        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
         
         dialog.exec()
     
@@ -962,18 +944,10 @@ class MainWindow(QMainWindow):
     
     def _show_playback_speed(self):
         """Показує діалог налаштування швидкості відтворення"""
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Швидкість відтворення")
-        dialog.setMinimumSize(480, 280)
-        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
+        dialog, layout = self._create_dialog("Швидкість відтворення", 500, 300)
         
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
-        
-        title = QLabel("Налаштування швидкості відтворення")
-        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold; border: none;")
-        layout.addWidget(title)
+        # Заголовок
+        self._add_dialog_title(layout, "Налаштування швидкості відтворення", 16)
         
         # Слайдер швидкості
         speed_layout = QHBoxLayout()
@@ -1060,35 +1034,9 @@ class MainWindow(QMainWindow):
         note.setStyleSheet("color: #888; font-size: 11px; border: none;")
         layout.addWidget(note)
         
-        # Кнопки
-        buttons_layout = QHBoxLayout()
-        buttons_layout.addStretch()
-        
-        close_btn = QPushButton("Закрити")
-        close_btn.setFixedHeight(32)
-        close_btn.setStyleSheet("""
-            QPushButton {
-                background: #6366f1;
-                border: none;
-                border-radius: 4px;
-                color: #ffffff;
-                font-size: 13px;
-                padding: 0 20px;
-            }
-            QPushButton:hover {
-                background: #4f46e5;
-            }
-            QPushButton:pressed {
-                background: #3730a3;
-            }
-        """)
+        # Кнопка закриття
+        close_btn = self._add_dialog_close_button(layout)
         close_btn.clicked.connect(dialog.accept)
-        buttons_layout.addWidget(close_btn)
-        
-        layout.addLayout(buttons_layout)
-        
-        # Escape для закриття
-        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
         
         dialog.exec()
     
@@ -2747,20 +2695,10 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Історія", "Історія відтворення порожня")
             return
         
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Історія відтворення")
-        dialog.setMinimumSize(650, 500)
-        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
-        
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(12)
+        dialog, layout = self._create_dialog("Історія відтворення", 680, 520)
         
         # Заголовок
-        title = QLabel(f"Нещодавно відтворені ({len(history)} треків)")
-        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold; border: none;")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title)
+        self._add_dialog_title(layout, f"Нещодавно відтворені ({len(history)} треків)")
         
         # Список історії
         history_list = QListWidget()
@@ -2849,9 +2787,6 @@ class MainWindow(QMainWindow):
         
         layout.addLayout(buttons_layout)
         
-        # Escape для закриття
-        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
-        
         dialog.exec()
     
     def _play_from_history(self, item: QListWidgetItem):
@@ -2893,25 +2828,10 @@ class MainWindow(QMainWindow):
     
     def _toggle_playlist(self):
         """Відкриває вікно плейлисту"""
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Плейлист")
-        dialog.setMinimumSize(700, 550)
-        
-        # Застосовуємо темну тему
-        dialog.setStyleSheet("""
-            QDialog {
-                background: #0f0f0f;
-            }
-        """)
-        
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(12)
+        dialog, layout = self._create_dialog("Плейлист", 720, 580)
         
         # Заголовок
-        title_label = QLabel("Плейлист")
-        title_label.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; background: transparent; border: none;")
-        layout.addWidget(title_label, 0)
+        self._add_dialog_title(layout, "Плейлист")
         
         # Пошук
         search_input = QLineEdit()
