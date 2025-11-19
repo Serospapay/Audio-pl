@@ -316,7 +316,7 @@ class MainWindow(QMainWindow):
         layout.setSpacing(12)
         
         title = QLabel("Гарячі клавіші")
-        title.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold;")
+        title.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; border: none;")
         layout.addWidget(title)
         
         shortcuts_text = """
@@ -342,7 +342,7 @@ class MainWindow(QMainWindow):
         
         text_label = QLabel(shortcuts_text)
         text_label.setWordWrap(True)
-        text_label.setStyleSheet("background: transparent;")
+        text_label.setStyleSheet("background: transparent; border: none;")
         layout.addWidget(text_label)
         
         layout.addStretch()
@@ -383,13 +383,13 @@ class MainWindow(QMainWindow):
         
         # Назва програми
         title = QLabel("Audio Player")
-        title.setStyleSheet("color: #6366f1; font-size: 24px; font-weight: bold;")
+        title.setStyleSheet("color: #6366f1; font-size: 24px; font-weight: bold; border: none;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
         
         # Версія
         version = QLabel("Версія 1.0")
-        version.setStyleSheet("color: #888; font-size: 14px;")
+        version.setStyleSheet("color: #888; font-size: 14px; border: none;")
         version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(version)
         
@@ -397,7 +397,7 @@ class MainWindow(QMainWindow):
         
         # Опис
         description = QLabel("Мінімалістичний аудіоплеєр з сучасним інтерфейсом")
-        description.setStyleSheet("color: #ffffff; font-size: 13px;")
+        description.setStyleSheet("color: #ffffff; font-size: 13px; border: none;")
         description.setAlignment(Qt.AlignmentFlag.AlignCenter)
         description.setWordWrap(True)
         layout.addWidget(description)
@@ -412,14 +412,14 @@ class MainWindow(QMainWindow):
             "• Настроюваний колір акценту\n"
             "• Гарячі клавіші та медіа-клавіші"
         )
-        features.setStyleSheet("color: #cccccc; font-size: 12px;")
+        features.setStyleSheet("color: #cccccc; font-size: 12px; border: none;")
         layout.addWidget(features)
         
         layout.addStretch()
         
         # Копірайт
         copyright_label = QLabel("© 2024")
-        copyright_label.setStyleSheet("color: #666; font-size: 11px;")
+        copyright_label.setStyleSheet("color: #666; font-size: 11px; border: none;")
         copyright_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(copyright_label)
         
@@ -536,7 +536,7 @@ class MainWindow(QMainWindow):
         layout.setSpacing(15)
         
         title = QLabel("Статистика відтворення")
-        title.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold;")
+        title.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; border: none;")
         layout.addWidget(title)
         
         # Отримуємо дані
@@ -591,7 +591,7 @@ class MainWindow(QMainWindow):
         # Топ-10 треків
         if top_tracks:
             top_title = QLabel("🏆 Топ-10 найчастіше відтворюваних:")
-            top_title.setStyleSheet("color: #ffffff; font-size: 14px; font-weight: bold; margin-top: 10px;")
+            top_title.setStyleSheet("color: #ffffff; font-size: 14px; font-weight: bold; margin-top: 10px; border: none;")
             layout.addWidget(top_title)
             
             top_list = QListWidget()
@@ -766,7 +766,7 @@ class MainWindow(QMainWindow):
         layout.setSpacing(15)
         
         title = QLabel("Виберіть колір акценту")
-        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold; border: none;")
         layout.addWidget(title)
         
         # Попередньо встановлені кольори
@@ -817,7 +817,7 @@ class MainWindow(QMainWindow):
         
         # Поточний колір
         current_label = QLabel(f"Поточний колір: {self._accent_color}")
-        current_label.setStyleSheet("color: #888; font-size: 12px;")
+        current_label.setStyleSheet("color: #888; font-size: 12px; border: none;")
         layout.addWidget(current_label)
         
         # Escape для закриття
@@ -983,14 +983,14 @@ class MainWindow(QMainWindow):
         layout.setSpacing(15)
         
         title = QLabel("Налаштування швидкості відтворення")
-        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold; border: none;")
         layout.addWidget(title)
         
         # Слайдер швидкості
         speed_layout = QHBoxLayout()
         
         speed_label = QLabel("Швидкість:")
-        speed_label.setStyleSheet("color: #ffffff; font-size: 13px;")
+        speed_label.setStyleSheet("color: #ffffff; font-size: 13px; border: none;")
         speed_layout.addWidget(speed_label)
         
         speed_slider = QSlider(Qt.Orientation.Horizontal)
@@ -1020,7 +1020,7 @@ class MainWindow(QMainWindow):
         speed_layout.addWidget(speed_slider, 1)
         
         speed_value = QLabel("1.0x")
-        speed_value.setStyleSheet("color: #6366f1; font-size: 14px; font-weight: bold;")
+        speed_value.setStyleSheet("color: #6366f1; font-size: 14px; font-weight: bold; border: none;")
         speed_value.setFixedWidth(50)
         speed_layout.addWidget(speed_value)
         
@@ -1037,7 +1037,7 @@ class MainWindow(QMainWindow):
         
         # Пресети
         presets_label = QLabel("Пресети:")
-        presets_label.setStyleSheet("color: #888; font-size: 12px; margin-top: 10px;")
+        presets_label.setStyleSheet("color: #888; font-size: 12px; margin-top: 10px; border: none;")
         layout.addWidget(presets_label)
         
         presets_layout = QHBoxLayout()
@@ -1068,7 +1068,7 @@ class MainWindow(QMainWindow):
         
         # Примітка
         note = QLabel("⚠️ Функція зміни швидкості в розробці")
-        note.setStyleSheet("color: #888; font-size: 11px;")
+        note.setStyleSheet("color: #888; font-size: 11px; border: none;")
         layout.addWidget(note)
         
         # Кнопки
@@ -1180,7 +1180,7 @@ class MainWindow(QMainWindow):
         
         # Роздільник
         separator = QLabel("•")
-        separator.setStyleSheet("color: #666; background: transparent; font-size: 12px;")
+        separator.setStyleSheet("color: #666; background: transparent; font-size: 12px; border: none;")
         separator.setFixedWidth(10)
         artist_album_layout.addWidget(separator, 0)
         
@@ -1270,7 +1270,7 @@ class MainWindow(QMainWindow):
         
         # Роздільник
         separator = QLabel("•")
-        separator.setStyleSheet("color: #666; background: transparent; font-size: 10px;")
+        separator.setStyleSheet("color: #666; background: transparent; font-size: 10px; border: none;")
         separator.setFixedWidth(8)
         separator.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         artist_album_layout.addWidget(separator, 0)
@@ -2769,7 +2769,7 @@ class MainWindow(QMainWindow):
         
         # Заголовок
         title = QLabel(f"Нещодавно відтворені ({len(history)} треків)")
-        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold;")
+        title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold; border: none;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
         
@@ -2921,7 +2921,7 @@ class MainWindow(QMainWindow):
         
         # Заголовок
         title_label = QLabel("Плейлист")
-        title_label.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; background: transparent;")
+        title_label.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; background: transparent; border: none;")
         layout.addWidget(title_label, 0)
         
         # Пошук
