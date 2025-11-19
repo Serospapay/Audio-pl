@@ -542,7 +542,7 @@ class MainWindow(QMainWindow):
         # Отримуємо дані
         playlist = self._player.get_playlist()
         history = self._player.get_history()
-        history_data = history.get_history()
+        history_data = history.get_all()
         
         # Рахуємо загальний час та частоту
         total_time_ms = 0
