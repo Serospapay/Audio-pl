@@ -585,7 +585,7 @@ class MainWindow(QMainWindow):
         
         stats_label = QLabel(stats_text)
         stats_label.setWordWrap(True)
-        stats_label.setStyleSheet("background: transparent;")
+        stats_label.setStyleSheet("background: transparent; border: none;")
         layout.addWidget(stats_label)
         
         # Топ-10 треків
