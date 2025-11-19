@@ -351,6 +351,152 @@ class MainWindow(QMainWindow):
         layout.addLayout(buttons_layout)
         return close_btn
     
+    def _show_message(self, title: str, text: str, icon_type: str = "information"):
+        """Показує повідомлення з темною темою"""
+        dialog = QDialog(self)
+        dialog.setWindowTitle(title)
+        dialog.setMinimumWidth(400)
+        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
+        
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+        
+        # Іконка + текст
+        content_layout = QHBoxLayout()
+        
+        # Іконка
+        if icon_type == "warning":
+            icon_text = "⚠️"
+        elif icon_type == "error":
+            icon_text = "❌"
+        elif icon_type == "question":
+            icon_text = "❓"
+        else:
+            icon_text = "ℹ️"
+        
+        icon_label = QLabel(icon_text)
+        icon_label.setStyleSheet("font-size: 32px; border: none;")
+        content_layout.addWidget(icon_label)
+        
+        # Текст
+        text_label = QLabel(text)
+        text_label.setStyleSheet("color: #ffffff; font-size: 13px; border: none;")
+        text_label.setWordWrap(True)
+        content_layout.addWidget(text_label, 1)
+        
+        layout.addLayout(content_layout)
+        
+        # Кнопка OK
+        ok_btn = QPushButton("OK")
+        ok_btn.setFixedHeight(32)
+        ok_btn.setStyleSheet("""
+            QPushButton {
+                background: #6366f1;
+                border: none;
+                border-radius: 4px;
+                color: #ffffff;
+                font-size: 13px;
+                padding: 0 20px;
+            }
+            QPushButton:hover {
+                background: #4f46e5;
+            }
+            QPushButton:pressed {
+                background: #3730a3;
+            }
+        """)
+        ok_btn.clicked.connect(dialog.accept)
+        
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+        btn_layout.addWidget(ok_btn)
+        layout.addLayout(btn_layout)
+        
+        # Escape закриває
+        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
+        
+        dialog.exec()
+    
+    def _show_question(self, title: str, text: str):
+        """Показує діалог з питанням (Так/Ні)"""
+        dialog = QDialog(self)
+        dialog.setWindowTitle(title)
+        dialog.setMinimumWidth(420)
+        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
+        
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+        
+        # Іконка + текст
+        content_layout = QHBoxLayout()
+        
+        icon_label = QLabel("❓")
+        icon_label.setStyleSheet("font-size: 32px; border: none;")
+        content_layout.addWidget(icon_label)
+        
+        text_label = QLabel(text)
+        text_label.setStyleSheet("color: #ffffff; font-size: 13px; border: none;")
+        text_label.setWordWrap(True)
+        content_layout.addWidget(text_label, 1)
+        
+        layout.addLayout(content_layout)
+        
+        # Кнопки Так/Ні
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addStretch()
+        
+        no_btn = QPushButton("Ні")
+        no_btn.setFixedHeight(32)
+        no_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+                border: 1px solid #444;
+                border-radius: 4px;
+                color: #ffffff;
+                font-size: 13px;
+                padding: 0 20px;
+            }
+            QPushButton:hover {
+                background: #2a2a2a;
+                border: 1px solid #6366f1;
+            }
+            QPushButton:pressed {
+                background: #1a1a1a;
+            }
+        """)
+        no_btn.clicked.connect(dialog.reject)
+        buttons_layout.addWidget(no_btn)
+        
+        yes_btn = QPushButton("Так")
+        yes_btn.setFixedHeight(32)
+        yes_btn.setStyleSheet("""
+            QPushButton {
+                background: #6366f1;
+                border: none;
+                border-radius: 4px;
+                color: #ffffff;
+                font-size: 13px;
+                padding: 0 20px;
+            }
+            QPushButton:hover {
+                background: #4f46e5;
+            }
+            QPushButton:pressed {
+                background: #3730a3;
+            }
+        """)
+        yes_btn.clicked.connect(dialog.accept)
+        buttons_layout.addWidget(yes_btn)
+        
+        layout.addLayout(buttons_layout)
+        
+        # Escape = Ні
+        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.reject)
+        
+        return dialog.exec() == QDialog.DialogCode.Accepted
+    
     def _show_shortcuts(self):
         """Показує діалог з гарячими клавішами"""
         dialog, layout = self._create_dialog("Гарячі клавіші", 500, 450)
@@ -492,7 +638,7 @@ class MainWindow(QMainWindow):
     def _load_recent_playlist(self, playlist_path):
         """Завантажує плейлист з останніх"""
         if not Path(playlist_path).exists():
-            QMessageBox.warning(self, "Помилка", f"Файл не знайдено:\n{playlist_path}")
+            self._show_message( "Помилка", f"Файл не знайдено:\n{playlist_path}")
             return
         
         from player.utils.playlist_io import load_m3u_playlist, load_json_playlist
@@ -507,7 +653,7 @@ class MainWindow(QMainWindow):
             self._player.get_playlist().clear()
             added = self._player.get_playlist().add_tracks(tracks)
             self._update_playlist_display()
-            QMessageBox.information(self, "Успіх", f"Завантажено {added} треків!")
+            self._show_message( "Успіх", f"Завантажено {added} треків!")
     
     def _show_statistics(self):
         """Показує розширену статистику з топ-10 та загальним часом"""
@@ -673,9 +819,9 @@ class MainWindow(QMainWindow):
                         f.write(f"{i}. {track} - {count} разів\n")
                     f.write("\n" + "=" * 50 + "\n")
                 
-                QMessageBox.information(self, "Успіх", f"Статистика експортована в:\n{file_path}")
+                self._show_message( "Успіх", f"Статистика експортована в:\n{file_path}")
             except Exception as e:
-                QMessageBox.warning(self, "Помилка", f"Не вдалося експортувати статистику:\n{str(e)}")
+                self._show_message( "Помилка", f"Не вдалося експортувати статистику:\n{str(e)}")
     
     def _toggle_compact_mode(self):
         """Перемикає компактний режим"""
@@ -826,7 +972,7 @@ class MainWindow(QMainWindow):
         if dialog:
             dialog.accept()
         
-        QMessageBox.information(self, "Успіх", f"Колір акценту змінено на {color}\n\nПерезапустіть програму для повного застосування змін.")
+        self._show_message( "Успіх", f"Колір акценту змінено на {color}\n\nПерезапустіть програму для повного застосування змін.")
     
     def _update_button_styles(self):
         """Оновлює стилі кнопок з новим кольором"""
@@ -895,7 +1041,7 @@ class MainWindow(QMainWindow):
         """Зберігає обкладинку в файл"""
         pixmap = self._artwork_label.pixmap()
         if not pixmap or pixmap.isNull():
-            QMessageBox.warning(self, "Помилка", "Немає обкладинки для збереження!")
+            self._show_message( "Помилка", "Немає обкладинки для збереження!")
             return
         
         file_path, _ = QFileDialog.getSaveFileName(
@@ -907,21 +1053,21 @@ class MainWindow(QMainWindow):
         
         if file_path:
             if pixmap.save(file_path):
-                QMessageBox.information(self, "Успіх", f"Обкладинку збережено в:\n{file_path}")
+                self._show_message( "Успіх", f"Обкладинку збережено в:\n{file_path}")
             else:
-                QMessageBox.warning(self, "Помилка", "Не вдалося зберегти обкладинку!")
+                self._show_message( "Помилка", "Не вдалося зберегти обкладинку!")
     
     def _copy_artwork(self):
         """Копіює обкладинку в буфер обміну"""
         from PyQt6.QtWidgets import QApplication
         pixmap = self._artwork_label.pixmap()
         if not pixmap or pixmap.isNull():
-            QMessageBox.warning(self, "Помилка", "Немає обкладинки для копіювання!")
+            self._show_message( "Помилка", "Немає обкладинки для копіювання!")
             return
         
         clipboard = QApplication.clipboard()
         clipboard.setPixmap(pixmap)
-        QMessageBox.information(self, "Успіх", "Обкладинку скопійовано в буфер обміну!")
+        self._show_message( "Успіх", "Обкладинку скопійовано в буфер обміну!")
     
     def _change_artwork(self):
         """Змінює обкладинку треку"""
@@ -938,9 +1084,9 @@ class MainWindow(QMainWindow):
                 scaled = pixmap.scaled(350, 350, Qt.AspectRatioMode.KeepAspectRatio, 
                                       Qt.TransformationMode.SmoothTransformation)
                 self._artwork_label.setPixmap(scaled)
-                QMessageBox.information(self, "Успіх", "Обкладинку змінено!")
+                self._show_message( "Успіх", "Обкладинку змінено!")
             else:
-                QMessageBox.warning(self, "Помилка", "Не вдалося завантажити зображення!")
+                self._show_message( "Помилка", "Не вдалося завантажити зображення!")
     
     def _show_playback_speed(self):
         """Показує діалог налаштування швидкості відтворення"""
@@ -2125,9 +2271,9 @@ class MainWindow(QMainWindow):
                         self._album_label.setText(album_text)
                         self._update_artwork(info.get('artwork'))
                 
-                QMessageBox.information(self, "Успіх", f"Додано {added} треків до плейлисту!")
+                self._show_message( "Успіх", f"Додано {added} треків до плейлисту!")
             else:
-                QMessageBox.warning(self, "Помилка", "Не знайдено аудіофайлів!")
+                self._show_message( "Помилка", "Не знайдено аудіофайлів!")
     
     def _format_time(self, milliseconds: int) -> str:
         """Форматує час у формат M:SS або H:MM:SS"""
@@ -2260,7 +2406,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot(str)
     def _on_player_error(self, error: str):
         """Обробник помилок"""
-        QMessageBox.warning(self, "Помилка", error)
+        self._show_message( "Помилка", error)
     
     def _update_position(self):
         """Оновлює позицію відтворення"""
@@ -2382,7 +2528,7 @@ class MainWindow(QMainWindow):
                         self._track_artist_label.setText(f"{info['artist']} - {info['album']}")
                         self._update_artwork(info.get('artwork'))
             else:
-                QMessageBox.information(self, "Інформація", "У вибраній папці не знайдено аудіофайлів")
+                self._show_message( "Інформація", "У вибраній папці не знайдено аудіофайлів")
     
     def _remove_track(self):
         """Видаляє вибраний трек з плейлисту"""
@@ -2394,14 +2540,7 @@ class MainWindow(QMainWindow):
     
     def _clear_playlist(self):
         """Очищає плейлист"""
-        reply = QMessageBox.question(
-            self,
-            "Підтвердження",
-            "Ви впевнені, що хочете очистити плейлист?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-        
-        if reply == QMessageBox.StandardButton.Yes:
+        if self._show_question("Підтвердження", "Ви впевнені, що хочете очистити плейлист?"):
             self._player.stop()
             self._player.get_playlist().clear()
             self._update_playlist_display()
@@ -2542,7 +2681,7 @@ class MainWindow(QMainWindow):
         if file_path:
             tracks = self._player.get_playlist().get_tracks()
             if not tracks:
-                QMessageBox.information(self, "Інформація", "Плейлист порожній!")
+                self._show_message( "Інформація", "Плейлист порожній!")
                 return
             
             from player.utils.playlist_io import save_m3u_playlist, save_json_playlist
@@ -2562,9 +2701,9 @@ class MainWindow(QMainWindow):
             
             if success:
                 self._save_recent_playlist(file_path)
-                QMessageBox.information(self, "Успіх", f"Плейлист збережено!\n{len(tracks)} треків")
+                self._show_message( "Успіх", f"Плейлист збережено!\n{len(tracks)} треків")
             else:
-                QMessageBox.warning(self, "Помилка", "Не вдалося зберегти плейлист!")
+                self._show_message( "Помилка", "Не вдалося зберегти плейлист!")
     
     def _load_playlist(self):
         """Завантажує плейлист"""
@@ -2585,18 +2724,90 @@ class MainWindow(QMainWindow):
             
             if tracks:
                 # Питаємо чи додати до поточного чи замінити
-                reply = QMessageBox.question(
-                    self,
-                    "Завантаження плейлисту",
-                    f"Знайдено {len(tracks)} треків.\nДодати до поточного плейлисту?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
-                )
+                # Показуємо діалог з вибором
+                dialog = QDialog(self)
+                dialog.setWindowTitle("Завантаження плейлисту")
+                dialog.setMinimumWidth(420)
+                dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
                 
-                if reply == QMessageBox.StandardButton.Cancel:
+                layout = QVBoxLayout(dialog)
+                layout.setContentsMargins(20, 20, 20, 20)
+                layout.setSpacing(15)
+                
+                # Текст
+                text_label = QLabel(f"Знайдено {len(tracks)} треків.\nДодати до поточного плейлисту?")
+                text_label.setStyleSheet("color: #ffffff; font-size: 13px; border: none;")
+                text_label.setWordWrap(True)
+                layout.addWidget(text_label)
+                
+                # Кнопки
+                buttons_layout = QHBoxLayout()
+                
+                cancel_btn = QPushButton("Скасувати")
+                cancel_btn.setFixedHeight(32)
+                cancel_btn.setStyleSheet("""
+                    QPushButton {
+                        background: transparent;
+                        border: 1px solid #444;
+                        border-radius: 4px;
+                        color: #ffffff;
+                        font-size: 13px;
+                        padding: 0 16px;
+                    }
+                    QPushButton:hover {
+                        background: #2a2a2a;
+                        border: 1px solid #6366f1;
+                    }
+                """)
+                cancel_btn.clicked.connect(lambda: dialog.done(0))
+                buttons_layout.addWidget(cancel_btn)
+                
+                buttons_layout.addStretch()
+                
+                no_btn = QPushButton("Замінити")
+                no_btn.setFixedHeight(32)
+                no_btn.setStyleSheet("""
+                    QPushButton {
+                        background: transparent;
+                        border: 1px solid #6366f1;
+                        border-radius: 4px;
+                        color: #6366f1;
+                        font-size: 13px;
+                        padding: 0 16px;
+                    }
+                    QPushButton:hover {
+                        background: #6366f1;
+                        color: #ffffff;
+                    }
+                """)
+                no_btn.clicked.connect(lambda: dialog.done(2))
+                buttons_layout.addWidget(no_btn)
+                
+                yes_btn = QPushButton("Додати")
+                yes_btn.setFixedHeight(32)
+                yes_btn.setStyleSheet("""
+                    QPushButton {
+                        background: #6366f1;
+                        border: none;
+                        border-radius: 4px;
+                        color: #ffffff;
+                        font-size: 13px;
+                        padding: 0 20px;
+                    }
+                    QPushButton:hover {
+                        background: #4f46e5;
+                    }
+                """)
+                yes_btn.clicked.connect(lambda: dialog.done(1))
+                buttons_layout.addWidget(yes_btn)
+                
+                layout.addLayout(buttons_layout)
+                
+                result = dialog.exec()
+                if result == 0:  # Cancel
                     return
                 
-                if reply == QMessageBox.StandardButton.No:
-                    # Замінюємо поточний плейлист
+                if result == 2:  # Replace
                     self._player.get_playlist().clear()
                     self._player.stop()
                 
@@ -2606,7 +2817,7 @@ class MainWindow(QMainWindow):
                 
                 if added > 0:
                     self._save_recent_playlist(file_path)
-                    QMessageBox.information(self, "Успіх", f"Завантажено {added} треків!")
+                    self._show_message( "Успіх", f"Завантажено {added} треків!")
                     # Встановлюємо перший трек як поточний якщо плейлист був порожній
                     if self._player.get_playlist().get_current_index() == -1:
                         self._player.get_playlist().set_current_index(0)
@@ -2617,9 +2828,9 @@ class MainWindow(QMainWindow):
                             self._track_artist_label.setText(f"{info['artist']} - {info['album']}")
                             self._update_artwork(info.get('artwork'))
                 else:
-                    QMessageBox.warning(self, "Увага", "Не вдалося додати жодного треку!")
+                    self._show_message( "Увага", "Не вдалося додати жодного треку!")
             else:
-                QMessageBox.warning(self, "Помилка", "Не вдалося завантажити плейлист або він порожній!")
+                self._show_message( "Помилка", "Не вдалося завантажити плейлист або він порожній!")
     
     def _on_playlist_reordered(self, parent=None, start=None, end=None, destination=None, row=None):
         """Обробник зміни порядку треків через drag & drop"""
@@ -2692,7 +2903,7 @@ class MainWindow(QMainWindow):
         history = self._player.get_history().get_recent(50)
         
         if not history:
-            QMessageBox.information(self, "Історія", "Історія відтворення порожня")
+            self._show_message( "Історія", "Історія відтворення порожня")
             return
         
         dialog, layout = self._create_dialog("Історія відтворення", 680, 520)
@@ -2808,17 +3019,10 @@ class MainWindow(QMainWindow):
     
     def _clear_history(self, dialog):
         """Очищає історію відтворення"""
-        reply = QMessageBox.question(
-            dialog,
-            "Підтвердження",
-            "Ви впевнені, що хочете очистити історію відтворення?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-        
-        if reply == QMessageBox.StandardButton.Yes:
+        if self._show_question("Підтвердження", "Ви впевнені, що хочете очистити історію відтворення?"):
             self._player.get_history().clear()
             dialog.accept()
-            QMessageBox.information(self, "Інформація", "Історія очищена")
+            self._show_message("Інформація", "Історія очищена")
     
     def _show_equalizer(self):
         """Показує діалог еквалайзера"""
