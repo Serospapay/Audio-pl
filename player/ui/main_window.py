@@ -372,9 +372,6 @@ class MainWindow(QMainWindow):
     
     def _show_about(self):
         """Показує діалог Про програму"""
-        from PyQt6.QtWidgets import QShortcut
-        from PyQt6.QtGui import QKeySequence
-        
         dialog = QDialog(self)
         dialog.setWindowTitle("Про програму")
         dialog.setMinimumSize(450, 320)
@@ -745,8 +742,7 @@ class MainWindow(QMainWindow):
     
     def _choose_accent_color(self):
         """Діалог вибору кольору акценту"""
-        from PyQt6.QtWidgets import QColorDialog, QShortcut
-        from PyQt6.QtGui import QColor, QKeySequence
+        from PyQt6.QtWidgets import QColorDialog
         
         # Попередньо встановлені кольори
         presets = [
@@ -832,7 +828,6 @@ class MainWindow(QMainWindow):
     def _choose_custom_color(self, parent_dialog):
         """Відкриває стандартний діалог вибору кольору"""
         from PyQt6.QtWidgets import QColorDialog
-        from PyQt6.QtGui import QColor
         
         color = QColorDialog.getColor(QColor(self._accent_color), self, "Виберіть колір")
         if color.isValid():
@@ -844,7 +839,6 @@ class MainWindow(QMainWindow):
         self._accent_color = color
         
         # Розраховуємо hover та pressed кольори (трохи світліше/темніше)
-        from PyQt6.QtGui import QColor
         base = QColor(color)
         
         # Hover - світліший
@@ -981,9 +975,6 @@ class MainWindow(QMainWindow):
     
     def _show_playback_speed(self):
         """Показує діалог налаштування швидкості відтворення"""
-        from PyQt6.QtWidgets import QShortcut
-        from PyQt6.QtGui import QKeySequence
-        
         dialog = QDialog(self)
         dialog.setWindowTitle("Швидкість відтворення")
         dialog.setMinimumSize(480, 280)
@@ -2764,8 +2755,6 @@ class MainWindow(QMainWindow):
     
     def _show_history(self):
         """Показує вікно з історією відтворення"""
-        from PyQt6.QtWidgets import QDialog, QVBoxLayout, QListWidget, QListWidgetItem, QPushButton, QLabel, QShortcut
-        from PyQt6.QtGui import QKeySequence
         from pathlib import Path
         
         history = self._player.get_history().get_recent(50)
