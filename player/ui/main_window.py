@@ -300,24 +300,63 @@ class MainWindow(QMainWindow):
         about_action = help_menu.addAction("Про програму")
         about_action.triggered.connect(self._show_about)
     
-    def _show_shortcuts(self):
-        """Показує діалог з гарячими клавішами"""
+    def _create_dialog(self, title: str, min_width: int = 450, min_height: int = 400):
+        """Створює уніфікований діалог"""
         dialog = QDialog(self)
-        dialog.setWindowTitle("Гарячі клавіші")
-        dialog.setMinimumSize(450, 400)
+        dialog.setWindowTitle(title)
+        dialog.setMinimumSize(min_width, min_height)
         dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
-        
-        # Escape закриває діалог
-        escape_shortcut = QShortcut(QKeySequence("Esc"), dialog)
-        escape_shortcut.activated.connect(dialog.accept)
         
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(12)
+        layout.setSpacing(15)
         
-        title = QLabel("Гарячі клавіші")
-        title.setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; border: none;")
+        # Escape закриває діалог
+        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
+        
+        return dialog, layout
+    
+    def _add_dialog_title(self, layout, text: str, size: int = 18):
+        """Додає заголовок до діалогу"""
+        title = QLabel(text)
+        title.setStyleSheet(f"color: #ffffff; font-size: {size}px; font-weight: bold; border: none;")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
+        return title
+    
+    def _add_dialog_close_button(self, layout):
+        """Додає кнопку закриття до діалогу"""
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addStretch()
+        
+        close_btn = QPushButton("Закрити")
+        close_btn.setFixedHeight(32)
+        close_btn.setStyleSheet("""
+            QPushButton {
+                background: #6366f1;
+                border: none;
+                border-radius: 4px;
+                color: #ffffff;
+                font-size: 13px;
+                padding: 0 20px;
+            }
+            QPushButton:hover {
+                background: #4f46e5;
+            }
+            QPushButton:pressed {
+                background: #3730a3;
+            }
+        """)
+        buttons_layout.addWidget(close_btn)
+        layout.addLayout(buttons_layout)
+        return close_btn
+    
+    def _show_shortcuts(self):
+        """Показує діалог з гарячими клавішами"""
+        dialog, layout = self._create_dialog("Гарячі клавіші", 500, 450)
+        
+        # Заголовок
+        self._add_dialog_title(layout, "Гарячі клавіші")
         
         shortcuts_text = """
         <div style='color: #ffffff; font-size: 13px; line-height: 1.8;'>
@@ -347,39 +386,15 @@ class MainWindow(QMainWindow):
         
         layout.addStretch()
         
-        close_btn = QPushButton("Закрити")
-        close_btn.setFixedSize(80, 32)
-        close_btn.setStyleSheet("""
-            QPushButton {
-                background: #6366f1;
-                border: none;
-                border-radius: 4px;
-                color: #ffffff;
-                font-size: 13px;
-                font-weight: 500;
-            }
-            QPushButton:hover { background: #7c3aed; }
-            QPushButton:pressed { background: #5b21b6; }
-        """)
+        # Кнопка закриття
+        close_btn = self._add_dialog_close_button(layout)
         close_btn.clicked.connect(dialog.accept)
-        
-        btn_layout = QHBoxLayout()
-        btn_layout.addStretch()
-        btn_layout.addWidget(close_btn)
-        layout.addLayout(btn_layout)
         
         dialog.exec()
     
     def _show_about(self):
         """Показує діалог Про програму"""
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Про програму")
-        dialog.setMinimumSize(450, 320)
-        dialog.setStyleSheet("QDialog { background: #0f0f0f; }")
-        
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
+        dialog, layout = self._create_dialog("Про програму", 480, 380)
         
         # Назва програми
         title = QLabel("Audio Player")
@@ -424,34 +439,8 @@ class MainWindow(QMainWindow):
         layout.addWidget(copyright_label)
         
         # Кнопка закриття
-        buttons_layout = QHBoxLayout()
-        buttons_layout.addStretch()
-        
-        close_btn = QPushButton("Закрити")
-        close_btn.setFixedHeight(32)
-        close_btn.setStyleSheet("""
-            QPushButton {
-                background: #6366f1;
-                border: none;
-                border-radius: 4px;
-                color: #ffffff;
-                font-size: 13px;
-                padding: 0 20px;
-            }
-            QPushButton:hover {
-                background: #4f46e5;
-            }
-            QPushButton:pressed {
-                background: #3730a3;
-            }
-        """)
+        close_btn = self._add_dialog_close_button(layout)
         close_btn.clicked.connect(dialog.accept)
-        buttons_layout.addWidget(close_btn)
-        
-        layout.addLayout(buttons_layout)
-        
-        # Escape для закриття
-        QShortcut(QKeySequence("Esc"), dialog).activated.connect(dialog.accept)
         
         dialog.exec()
     
