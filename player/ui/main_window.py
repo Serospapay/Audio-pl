@@ -5,10 +5,10 @@ from pathlib import Path
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QSlider, QLabel, QListWidget, QListWidgetItem, QFileDialog,
-    QMessageBox, QFrame, QSizePolicy, QLineEdit, QMenu, QComboBox, QSplitter, QDialog
+    QMessageBox, QFrame, QSizePolicy, QLineEdit, QMenu, QComboBox, QSplitter, QDialog, QMenuBar
 )
 from PyQt6.QtCore import Qt, QTimer, pyqtSlot, QPoint
-from PyQt6.QtGui import QIcon, QFont, QPalette, QColor, QPixmap, QShortcut, QKeySequence
+from PyQt6.QtGui import QIcon, QFont, QPalette, QColor, QPixmap, QShortcut, QKeySequence, QCursor, QAction
 from PyQt6.QtMultimedia import QMediaPlayer
 
 # Спробуємо імпортувати бібліотеки для покращення UI
@@ -884,7 +884,6 @@ class MainWindow(QMainWindow):
     
     def _on_artwork_click(self, event):
         """Обробник кліку на обкладинку"""
-        from PyQt6.QtCore import Qt
         if event.button() == Qt.MouseButton.LeftButton:
             self._add_files()
     
@@ -963,7 +962,6 @@ class MainWindow(QMainWindow):
         )
         
         if file_path:
-            from PyQt6.QtGui import QPixmap
             pixmap = QPixmap(file_path)
             if not pixmap.isNull():
                 scaled = pixmap.scaled(350, 350, Qt.AspectRatioMode.KeepAspectRatio, 
@@ -2689,7 +2687,6 @@ class MainWindow(QMainWindow):
     def _on_playlist_reordered(self, parent=None, start=None, end=None, destination=None, row=None):
         """Обробник зміни порядку треків через drag & drop"""
         # Використовуємо QTimer для відкладеної обробки після завершення drag & drop
-        from PyQt6.QtCore import QTimer
         QTimer.singleShot(100, self._update_playlist_order)
     
     def _update_playlist_order(self):
@@ -2755,8 +2752,6 @@ class MainWindow(QMainWindow):
     
     def _show_history(self):
         """Показує вікно з історією відтворення"""
-        from pathlib import Path
-        
         history = self._player.get_history().get_recent(50)
         
         if not history:
@@ -2963,7 +2958,6 @@ class MainWindow(QMainWindow):
         
         # Обробка клавіш для плейлисту
         def handle_playlist_keys(event):
-            from PyQt6.QtCore import Qt
             if event.key() == Qt.Key.Key_Delete:
                 # Delete - видалити трек
                 current = playlist_list.currentItem()
